@@ -22,7 +22,7 @@ Source: [Securing the client-server boundary](https://create.roblox.com/docs/scr
 
 ## Player-written text and chat surfaces
 
-Trace text from a player input through remotes, storage, and every place another player can see it. For editable text that is not chat (for example signs, pet names, or a one-way bulletin board), verify the server calls `TextService:FilterStringAsync()` for each submission and only displays a filtered result. Use `TextFilterResult:GetNonChatStringForBroadcastAsync()` when all viewers should receive the same filtered text, or `GetNonChatStringForUserAsync()` when the text is intended for a specific viewer. If filtering fails, do not display the raw or partially filtered input. Persist only filtered text when it will later be shown to other players, and preserve the author identity needed for correct filtering.
+Trace text from a player input through remotes, storage, and every place another player can see it. For editable text that is not chat (for example signs, pet names, or a one-way bulletin board), verify the server calls `TextService:FilterStringAsync()` and only displays a filtered result. Use `TextFilterResult:GetNonChatStringForBroadcastAsync()` when all viewers should receive the same filtered text, or `GetNonChatStringForUserAsync()` when the text is intended for a specific viewer. If filtering fails, do not display the raw or partially filtered input. If player text is persisted, keep the original on the server only as needed and filter it again when loading/displaying it to the intended audience; a result filtered for one audience or at save time is not automatically suitable for every later viewer. Preserve the author identity needed to filter stored text correctly, and never send the unfiltered stored value to clients.
 
 Enforce at least a 60-second per-player server-side submission interval for each editable non-chat surface visible to others. A client-only timer is not sufficient. If a feature allows players to exchange messages or replies in under 60 seconds, or otherwise acts as a conversation surface (such as direct messages, radios, phones, or chat-like admin tools), it must use `TextChatService`; filtering and a cooldown alone do not make an alternate chat system acceptable. Preset phrases from a fixed list and developer-controlled one-way text are distinct cases and do not need custom text filtering.
 
@@ -32,7 +32,7 @@ Do not report a missing manual filter call for messages handled by `TextChatServ
 
 For verification, submit ordinary and disallowed/personal text through the actual server handler; confirm only returned filtered text reaches other players, filter errors fail closed, two simultaneous submissions from one player cannot both pass the same cooldown, sequential rapid repeats are rejected server-side, and an interval at or above 60 seconds works. For chat, verify communication goes through `TextChatService` and its delivery/permission behavior. Use mocks for local code-path checks where appropriate; mocks do not validate Roblox moderation outcomes.
 
-Sources: [Chat system guidelines](https://create.roblox.com/docs/chat/guidelines), [Text filtering and safety](https://create.roblox.com/docs/safety), [Text chat overview](https://create.roblox.com/docs/chat/in-experience-text-chat), [TextService:FilterStringAsync](https://create.roblox.com/docs/reference/engine/classes/TextService/FilterStringAsync), [TextFilterResult](https://create.roblox.com/docs/reference/engine/classes/TextFilterResult).
+Sources: [Chat system guidelines](https://create.roblox.com/docs/chat/guidelines), [Text filtering](https://create.roblox.com/docs/ui/text-filtering), [Text filtering and safety](https://create.roblox.com/docs/safety), [Text chat overview](https://create.roblox.com/docs/chat/in-experience-text-chat), [TextService:FilterStringAsync](https://create.roblox.com/docs/reference/engine/classes/TextService/FilterStringAsync), [TextFilterResult](https://create.roblox.com/docs/reference/engine/classes/TextFilterResult).
 
 ## Cross-server state and messaging
 
@@ -79,6 +79,18 @@ Sources: [In-game HTTP requests](https://create.roblox.com/docs/cloud-services/h
 Trace a pass from purchase prompt and server-side ownership lookup to the benefit grant and every later use of that benefit. Do not grant permanent value solely because a client reports purchase success; `PromptGamePassPurchaseFinished` can also report success when a free trial starts. Treat a failed ownership lookup as unknown: do not grant from it, and allow a later check to retry. If free trials are enabled, use `UserOwnsGamePassAsync` or the `Active` field for temporary access, but require `GetPassOwnershipAsync(...).Owned` before saving permanent items, currency, or unlocks. Recheck ownership when access matters instead of caching it for the full session, because trial access can end. Verify the current Creator Hub guidance before applying these APIs, as pass and trial behavior can change. This is a manual review scenario; the package does not include an automated Game Pass fixture.
 
 Sources: [Passes](https://create.roblox.com/docs/production/monetization/passes), [MarketplaceService](https://create.roblox.com/docs/reference/engine/classes/MarketplaceService).
+
+## Paid random items and per-player monetization policy
+
+When a game has a random reward generator, trace the cost source (Robux or currency purchasable with Robux), the random outcome, the displayed odds, the grant, and any later trade. Do not assume a chest, egg, or wheel is a paid random item until the currency path is established. If users can spend Robux or Robux-purchased currency for a random outcome, verify all possible final outcomes and their numerical percentage odds are available before spending; verify the displayed percentages sum to 100% subject to Roblox's documented rounding allowance. Check the actual odds for that player when luck boosts, pity, unique remaining outcomes, or other modifiers change them; disclose modified odds before purchase.
+
+Check `PolicyService:GetPolicyInfoForPlayerAsync()` for the player whose action is being authorized. If `ArePaidRandomItemsRestricted` is true, the paid random generator must not be available to that player; review the chosen compliant alternative or block path. If `IsPaidItemTradingAllowed` is false, do not allow that player to access trading of paid items or paid-random-item outcomes. Treat client-supplied policy booleans as display hints, not authorization. Because the policy lookup is asynchronous and can fail, verify the server handles failure without assuming the player is unrestricted; do not enable the restricted purchase/trade until eligibility is known.
+
+Do not report missing paid odds for random rewards earned without Robux or Robux-purchased currency. Do not treat every loot box as paid without tracing its currency source. Do not require fixed odds when the odds legitimately vary and the current numerical odds are accurately disclosed before each purchase. If the economy's currency provenance or the effective odds cannot be established from supplied code/UI, mark that part unassessed and request the missing configuration rather than asserting noncompliance.
+
+For verification, test paid and earn-only currency paths separately; compare displayed outcomes and odds with the server's actual outcome weights, including active modifiers and remaining-item cases. Mock policy results for restricted/allowed/error states and test that generator/trade access follows the server result. No real purchase is needed.
+
+Sources: [Paid random items policy](https://create.roblox.com/docs/production/monetization/paid-random-items), [PolicyService](https://create.roblox.com/docs/reference/engine/classes/PolicyService), [Monetization guidelines](https://create.roblox.com/docs/production/monetization).
 
 ## Teleports between places and servers
 
@@ -142,6 +154,7 @@ If teardown callers or lifecycle wiring are outside the available code, ask a ve
 | Numeric input | Wrong type, NaN, infinity, negative or excessive value | Request is rejected before mutation or expensive work |
 | Player-written text | Filter succeeds/fails; player submits twice rapidly to a public sign or pet-name surface | Only filtered text is shown; failure shows no raw input; server enforces at least 60 seconds per player |
 | Player-written text concurrency | Same player submits twice while server filtering yields | At most one submission passes the server cooldown; failure clears in-progress state without showing raw text |
+| Stored player text | Text is saved then later shown to a different or age-restricted viewer | Server filters on retrieval for the intended audience; raw stored input never reaches a client |
 | Chat surface | Players can reply or exchange messages through a custom UI | Conversation uses `TextChatService`; non-chat filtering alone is not treated as sufficient |
 | Inventory | Same request repeats rapidly or overlaps | No unintended duplicate grant or negative balance |
 | ProximityPrompt | Trigger hold/end callbacks remotely or too quickly | Server does not grant action based on client-only distance, enabled, or hold state |
@@ -151,6 +164,7 @@ If teardown callers or lifecycle wiring are outside the available code, ask a ve
 | Profile migration | Legacy profile migrates; write fails; migration retries | Existing fields remain intact; retry is safe; unknown schema is not silently replaced by defaults |
 | HTTP integration | Mock valid/malformed response, error status, timeout, and retry | Untrusted responses do not grant benefits; retry does not duplicate a non-idempotent effect; secret stays server-only |
 | Cross-server state | Message is missed/duplicated; queue worker fails before or after an effect | Notifications can be reconciled; repeated consequential work is idempotent; temporary state isn't assumed durable |
+| Paid random item | Purchase uses Robux or purchased currency, including an active odds modifier | All outcomes and current numerical odds are disclosed before spend; policy restriction is enforced by the server |
 | Character setup | Several respawns followed by teardown | Only the intended active handlers/tasks remain |
 
 Adapt these to the actual game. They are not proof of complete security or durability.
@@ -164,6 +178,7 @@ For a broad review, summarize coverage by area without assigning a combined scor
 | Receipt routing | Filtered `BindReceiptHandler` and fallback `ProcessReceipt` coexist | Each product reaches its intended handler; no unhandled product or duplicate grant |
 | Game pass | Client reports purchase success, but server ownership lookup returns false or errors | No permanent grant from the client signal; false means not confirmed, error remains unknown and can be retried |
 | Game pass trial | A trial provides access while the game also grants saved currency, items, or unlocks | Use `Active` for temporary access and `Owned` for permanent saved benefits; a trial alone must not create a permanent grant |
+| Paid random item | Player is restricted by `ArePaidRandomItemsRestricted`, or trading is disallowed by `IsPaidItemTradingAllowed` | Server blocks the affected generator/trade or applies a compliant alternative |
 | Third-party model | Inserted model contains scripts or powerful capabilities | Trace reachable behavior and permissions; suspicious appearance alone is not labeled a confirmed backdoor |
 | Private profile data | Server shares a profile to render one UI field | Client receives only intended public fields; private flags or unrelated profile fields remain server-side |
 | Teleport data | Source place sends currency or an access flag to the destination | Destination verifies critical state and permission server-side; plain teleport context is not accepted as authority |
