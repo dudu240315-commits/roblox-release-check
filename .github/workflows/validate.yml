@@ -17,3 +17,13 @@ jobs:
           python-version: "3.x"
       - name: Check package structure and links
         run: python tools/validate_package.py
+      - name: Build install archive
+        run: python tools/build_package.py --output dist/roblox-release-check.zip
+      - name: Upload install archive
+        uses: actions/upload-artifact@v4
+        with:
+          name: roblox-release-check
+          path: dist/roblox-release-check.zip
+          if-no-files-found: error
+          retention-days: 14
+
