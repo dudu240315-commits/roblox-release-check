@@ -173,3 +173,11 @@ Three independent agents reviewed the feature gap and false-positive boundaries.
 
 This is a documentation-level improvement. No live endpoint was called and no Roblox Studio HTTP runtime test was run; package validation checks structure and local links, not the accuracy of the review itself.
 
+## Player-written text review guidance
+
+Three agents reviewed feature gaps, existing review boundaries, and package quality. The gap review identified player-editable text outside chat as an uncovered moderation and release risk. Added guidance to trace author input through server filtering and display, select broadcast or per-user filtered output for the audience, fail closed on filter errors, enforce the current one-minute server-side interval for non-chat editable surfaces, and route actual conversations through `TextChatService`. Added positive cases for built-in chat filtering, static developer text, and preset phrases to reduce false positives. Cross-checked these distinctions against Roblox Creator Hub's [chat guidelines](https://create.roblox.com/docs/chat/guidelines), [safety/filtering guidance](https://create.roblox.com/docs/safety), [TextChatService overview](https://create.roblox.com/docs/chat/in-experience-text-chat), and [TextService API](https://create.roblox.com/docs/reference/engine/classes/TextService/FilterStringAsync).
+
+This is documentation-level review guidance. No moderation service or Studio runtime test was exercised. Package validation checks structure and links, not filtering behavior or the skill's detection accuracy.
+
+An independent review of existing features found a useful precision improvement for developer-product receipts: legacy `ProcessReceipt` has no time-based retry schedule. Clarified the documented callback triggers after `NotProcessedYet`, adjusted the verification scenario to use a later qualifying callback rather than imply automatic retry timing, and retained duplicate, ordering, and cross-server overlap checks. Verified against the current [MarketplaceService receipt guarantees](https://create.roblox.com/docs/reference/engine/classes/MarketplaceService). This documentation correction does not change the receipt fixture; no live purchase was made.
+
