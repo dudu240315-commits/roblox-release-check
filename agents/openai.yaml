@@ -1,0 +1,4 @@
+interface:
+  display_name: "Roblox Release Check"
+  short_description: "Find Roblox release risks and suggest focused fixes"
+  default_prompt: "Use $roblox-release-check to review my Roblox project and report actionable release risks with evidence, fixes, and verification steps."
