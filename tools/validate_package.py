@@ -26,6 +26,7 @@ REQUIRED = (
     "tests/failure-regression.luau",
     "tests/receipt-regression.luau",
     "tests/MUTATIONS.md",
+    "tools/build_package.py",
 )
 
 
@@ -90,3 +91,4 @@ print(f"PASS: package structure, metadata, placeholders, and local links ({len(R
 print("NOTE: this check does not run Luau/Studio tests or assess security-review accuracy")
 if not (ROOT / "LICENSE").exists():
     print("ACTION: choose a license and add LICENSE before inviting reuse")
+
