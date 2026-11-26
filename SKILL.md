@@ -22,6 +22,7 @@ For a review request, report findings without changing the project. For an expli
 Read [references/review-guide.md](references/review-guide.md) for the relevant checks and official sources. Prioritize reachable bugs over style preferences:
 
 - Follow client-controlled input to authoritative rewards, purchases, damage, inventory changes, and shared state.
+- Trace information that should stay private through replication and remote responses; verify what each client can read instead of treating every replicated value as sensitive.
 - When projects include Creator Store/Toolbox models or third-party packages, inspect their scripts, dynamic code loading, and granted capabilities; report a concrete reachable risk or mark an unverified source for review, not as a confirmed backdoor by itself.
 - For game passes, trace server-side ownership checks through benefit grants and later use; distinguish temporary access from permanent rewards when trials are enabled.
 - Trace consequential `ProximityPrompt`, `ClickDetector`, and `DragDetector` handlers as client-triggerable entry points; use the reference guidance for their event-specific server checks.
