@@ -64,6 +64,14 @@ Use UpdateAsync when an update depends on the stored value. Its callback can run
 
 Sources: [Data stores](https://create.roblox.com/docs/cloud-services/data-stores), [Best practices](https://create.roblox.com/docs/cloud-services/data-stores/best-practices), [GlobalDataStore](https://create.roblox.com/docs/reference/engine/classes/GlobalDataStore).
 
+### Profile schema changes and migrations
+
+When a release changes a saved profile shape, trace a real legacy profile from load through conversion to write. Check that conversion preserves unrelated progress, can safely run again after a failed or interrupted write, and does not mark a profile migrated before the converted value is successfully persisted. Do not replace an unexpected or failed-to-load profile with defaults unless the code has established it is genuinely new; fail safely or defer the write when the old shape is unknown. If older and newer server code can overlap, check whether an older save can overwrite the new shape. A schema-version field is useful but not mandatory; its absence alone is not a finding.
+
+For a meaningful migration, use representative old/current profile fixtures and verify: old profile converts once; a second run leaves it unchanged; a failure before persistence can be retried without loss or duplicate transformation; and unknown/corrupt data is not silently reset. These are review/test suggestions, not automated fixtures in this package. Before a broad data-shape rollout, review the available backup/restore plan. Roblox DataStore version history is not a backup of every write: it keeps the first write to a key per UTC hour, later writes in that hour can replace that version, and overwritten versions expire after 30 days.
+
+Sources: [Best practices for data stores](https://create.roblox.com/docs/cloud-services/data-stores/best-practices), [Data store versioning, listing, and caching](https://create.roblox.com/docs/cloud-services/data-stores/versioning-listing-and-caching), [Open Cloud data stores](https://create.roblox.com/docs/cloud/guides/data-stores).
+
 ## Developer product receipts
 
 When developer products are in scope, trace the actual `MarketplaceService.ProcessReceipt` and any `BindReceiptHandler` routing through each server-owned grant rule. Filtered bound handlers can take precedence while unmatched receipts fall through to `ProcessReceipt`; don't report missing coverage until routing is followed. Do not treat `PromptProductPurchaseFinished` as proof of purchase. Roblox documents receipt callbacks can be retried, arrive out of order, or overlap across servers; check duplicate `PurchaseId` handling against the project's persistence/session design. Avoid external balance or inventory side effects inside an `UpdateAsync` transform because Roblox may call the transform more than once. Confirm a receipt is acknowledged only after the benefit is safely recorded, and transient failures remain retryable. Trace handler ownership before reporting multiple callbacks or missing coverage.
@@ -99,6 +107,7 @@ If teardown callers or lifecycle wiring are outside the available code, ask a ve
 | ClickDetector | Trigger far away or repeatedly | Consequential action checks server distance, permission, and rate |
 | Profile load | Storage read fails | Existing progress cannot be overwritten by fallback defaults |
 | Profile save | Older save retries after a newer save | Older state does not silently replace newer progress |
+| Profile migration | Legacy profile migrates; write fails; migration retries | Existing fields remain intact; retry is safe; unknown schema is not silently replaced by defaults |
 | Character setup | Several respawns followed by teardown | Only the intended active handlers/tasks remain |
 
 Adapt these to the actual game. They are not proof of complete security or durability.
