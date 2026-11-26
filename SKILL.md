@@ -31,6 +31,7 @@ Read [references/review-guide.md](references/review-guide.md) for the relevant c
 - Follow player data from load through mutation to save, including failures, retries, overlapping sessions, departure, and shutdown.
 - When profile schemas change, trace legacy-data conversion, repeat/failure safety, preserved fields, and compatibility with any older servers that may still save.
 - When developer products are in scope, trace receipt callbacks through durable grants and duplicate/retry handling; read the relevant receipt guidance in the reference.
+- When `HttpService` or an external API affects gameplay, trace credentials, client-controlled request fields, response validation, failure handling, and duplicate side effects; do not treat HTTP use alone as a finding.
 - Inspect lifecycle and performance only where the code shows a concrete failure path or there is profiling evidence.
 
 Distinguish confirmed findings from questions and unmeasured hypotheses. Do not claim a game is secure or release-ready because no issues were found in a subset. Do not invent a numerical health score. If API behavior or limits affect a conclusion, verify current official documentation when access is available; otherwise state the uncertainty.
@@ -67,3 +68,4 @@ Bound test waits and clean up tasks/connections before raising failures. Canceli
 Cover both sides of a relevant boundary: missing/empty values and the maximum valid size or quantity, not just values beyond it. Separate validation and rate-limit phases so earlier test traffic does not mask the behavior being checked. When test workers create child tasks, register those children for cleanup as well; canceling a worker alone does not prove its children stopped.
 
 For security-critical fixes, verify enforcement through the actual handler, not only isolated validation or limiter helpers. When test sensitivity is uncertain, a targeted mutation in a disposable fixture can show whether the intended assertion fails; unrelated errors do not count. Restore the original code and rerun the baseline afterward. Mutation results demonstrate test sensitivity, not independent AI-review accuracy.
+
