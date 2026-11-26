@@ -1,12 +1,14 @@
 # Roblox Release Check
 
-A practical AI skill for Roblox creators: find risky code before players do, including client-triggered interactions, replicated data exposure, movement/physics paths, third-party models, and monetization flows such as developer products and game passes.
+A practical AI skill for Roblox creators: find risky code before players do, including client-triggered interactions, replicated data exposure, cross-place teleports, movement/physics paths, third-party models, and monetization flows such as developer products and game passes.
 
 It guides an assistant through exploitable remote handlers, potential data loss, lifecycle bugs, and performance concerns, then produces prioritized findings with evidence and focused fixes. Reports follow the user's language, including Hebrew.
 
 For broad audits, it can also provide a short coverage summary showing what was reviewed, what could not be assessed from the supplied project, and what still needs a Studio check. This is part of the assistant's review guidance, not an automated scanner feature.
 
 When given a Git diff or before/after versions, it can review the changed paths and relevant dependencies, separating newly introduced regressions from pre-existing risks.
+
+Cross-place teleport and data-exposure checks are guided code reviews. The included Studio fixtures do not automate those scenarios; teleport runtime checks use Studio Test/Team Test where supported and have documented limitations.
 
 This is an instruction-based skill, not a Roblox Studio plugin or a standalone scanner. It needs an AI assistant and access to your project code. Studio tools are optional; runtime tests require an appropriate Roblox environment. It does not certify an experience as secure.
 
