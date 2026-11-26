@@ -1,6 +1,6 @@
 # Roblox Release Check
 
-A practical AI skill for Roblox creators: find risky code before players do, including client-triggered interactions, player-written text and chat surfaces, replicated data exposure, cross-place teleports, movement/physics paths, third-party models, HTTP/API integrations, and monetization flows such as developer products and game passes.
+A practical AI skill for Roblox creators: find risky code before players do, including client-triggered interactions, player-written text and chat surfaces, cross-server messaging and temporary state, replicated data exposure, cross-place teleports, movement/physics paths, third-party models, HTTP/API integrations, and monetization flows such as developer products and game passes.
 
 It guides an assistant through exploitable remote handlers, potential data loss, lifecycle bugs, and performance concerns, then produces prioritized findings with evidence and focused fixes. Reports follow the user's language, including Hebrew.
 
@@ -13,6 +13,8 @@ Cross-place teleport, data-exposure, and profile-migration checks are guided cod
 HTTP/API integration checks are guided reviews too. The reference covers secret handling, request/response trust boundaries, failures, and duplicate side effects. It suggests mock-based verification; the package does not call a live external service or automatically scan HTTP code.
 
 Player-written text checks are guided reviews: the skill distinguishes filtered non-chat text surfaces from conversations that must use `TextChatService`. It does not inspect live moderation outcomes.
+
+Cross-server checks cover best-effort messages and temporary MemoryStore data, including missed notifications, expiration, queue retries, and duplicate effects. These are review prompts, not a distributed-systems simulator.
 
 This is an instruction-based skill, not a Roblox Studio plugin or a standalone scanner. It needs an AI assistant and access to your project code. Studio tools are optional; runtime tests require an appropriate Roblox environment. It does not certify an experience as secure.
 
