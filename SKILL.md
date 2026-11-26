@@ -25,6 +25,7 @@ Read [references/review-guide.md](references/review-guide.md) for the relevant c
 - Trace information that should stay private through replication and remote responses; verify what each client can read instead of treating every replicated value as sensitive.
 - When projects include Creator Store/Toolbox models or third-party packages, inspect their scripts, dynamic code loading, and granted capabilities; report a concrete reachable risk or mark an unverified source for review, not as a confirmed backdoor by itself.
 - For game passes, trace server-side ownership checks through benefit grants and later use; distinguish temporary access from permanent rewards when trials are enabled.
+- For multi-place experiences, trace teleport payloads and access decisions from source to destination; treat client-visible teleport data as context, not proof of currency, inventory, or permission.
 - Trace consequential `ProximityPrompt`, `ClickDetector`, and `DragDetector` handlers as client-triggerable entry points; use the reference guidance for their event-specific server checks.
 - For games where physics or movement changes rewards/combat/shared state, trace network ownership and `Touched` paths; account for legitimate teleports, vehicles, and latency before suggesting movement thresholds.
 - Follow player data from load through mutation to save, including failures, retries, overlapping sessions, departure, and shutdown.
