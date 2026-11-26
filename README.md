@@ -1,6 +1,6 @@
 # Roblox Release Check
 
-A practical AI skill for Roblox creators: find risky code before players do, including client-triggered interactions, replicated data exposure, cross-place teleports, movement/physics paths, third-party models, HTTP/API integrations, and monetization flows such as developer products and game passes.
+A practical AI skill for Roblox creators: find risky code before players do, including client-triggered interactions, player-written text and chat surfaces, replicated data exposure, cross-place teleports, movement/physics paths, third-party models, HTTP/API integrations, and monetization flows such as developer products and game passes.
 
 It guides an assistant through exploitable remote handlers, potential data loss, lifecycle bugs, and performance concerns, then produces prioritized findings with evidence and focused fixes. Reports follow the user's language, including Hebrew.
 
@@ -11,6 +11,8 @@ When given a Git diff or before/after versions, it can review the changed paths 
 Cross-place teleport, data-exposure, and profile-migration checks are guided code reviews. The included fixtures do not automate those scenarios; teleport runtime checks use Studio Test/Team Test where supported and have documented limitations.
 
 HTTP/API integration checks are guided reviews too. The reference covers secret handling, request/response trust boundaries, failures, and duplicate side effects. It suggests mock-based verification; the package does not call a live external service or automatically scan HTTP code.
+
+Player-written text checks are guided reviews: the skill distinguishes filtered non-chat text surfaces from conversations that must use `TextChatService`. It does not inspect live moderation outcomes.
 
 This is an instruction-based skill, not a Roblox Studio plugin or a standalone scanner. It needs an AI assistant and access to your project code. Studio tools are optional; runtime tests require an appropriate Roblox environment. It does not certify an experience as secure.
 
