@@ -1,6 +1,6 @@
 # Roblox Release Check
 
-A practical AI skill for Roblox creators: find risky code before players do, including client-triggered interactions, movement/physics paths, third-party models, and monetization flows such as developer products and game passes.
+A practical AI skill for Roblox creators: find risky code before players do, including client-triggered interactions, replicated data exposure, movement/physics paths, third-party models, and monetization flows such as developer products and game passes.
 
 It guides an assistant through exploitable remote handlers, potential data loss, lifecycle bugs, and performance concerns, then produces prioritized findings with evidence and focused fixes. Reports follow the user's language, including Hebrew.
 
