@@ -6,6 +6,14 @@ Use only the sections relevant to the reviewed feature. These are investigation 
 
 When given a diff or before/after versions, review the changed paths first, then trace only the callers, callees, configuration, or data flow needed to establish impact. Compare the base and proposed behavior before labeling a finding as introduced by the change. If the base version is unavailable, mark introduction status as unknown. Keep pre-existing risks separate and include them only when they affect the changed feature or release decision. Do not treat unchanged lines shown as context as newly introduced defects.
 
+## Information exposed to clients
+
+For data with a real confidentiality requirement, trace where it is parented and sent, and which clients can receive it. Check `ReplicatedStorage`, `ReplicatedFirst`, `Workspace`, player/character instances, attributes, client-visible ModuleScripts, and `RemoteEvent`/`RemoteFunction` responses. Account for the actual recipient: `FireAllClients` exposes data more broadly than `FireClient`, while a client can inspect any content that has replicated to it. Server-only logic and values belong in server-only containers such as `ServerScriptService` or `ServerStorage`; a server check inside a replicated ModuleScript does not hide that module's source.
+
+Do not report a value merely because it replicates. Names, scores, currency, loadouts, and other values intended for a leaderboard or UI are not confidentiality findings by themselves. Establish what information is meant to stay private, show the code path and recipient that exposes it, and explain the practical impact. A full profile sent for a small UI may expose unrelated flags or private fields; recommend returning only the fields the UI needs. An `admin` flag alone does not prove privilege escalation: if it only affects UI, assess confidentiality separately; if a client-side permission gate relies on it, trace whether the server independently enforces that permission. If ancestry or recipients cannot be established from the supplied files, mark exposure as unassessed and name the Studio check needed.
+
+Sources: [Access control and confidentiality](https://create.roblox.com/docs/scripting/security/access-control), [Data model](https://create.roblox.com/docs/projects/data-model), [Remote events and callbacks](https://create.roblox.com/docs/scripting/events/remote).
+
 ## Client-server boundary
 
 Trace remote input through server helpers. Check types, finite numeric values, bounds, instance ancestry, ownership, current gameplay state, and permission to perform the action. Treat prices, reward amounts, and damage supplied by the client as claims to verify against server rules. Check rate limits on the server where repeated requests could cause harm; a UI cooldown is insufficient evidence of server protection. Account for legitimate bursts before proposing a limit.
@@ -97,3 +105,4 @@ For a broad review, summarize coverage by area without assigning a combined scor
 | Game pass | Client reports purchase success, or ownership lookup fails | The server does not grant from the client signal alone; failed lookup remains unknown and does not create permanent value |
 | Game pass trial | A trial provides access while the game also grants saved currency, items, or unlocks | Use `Active` for temporary access and `Owned` for permanent saved benefits; a trial alone must not create a permanent grant |
 | Third-party model | Inserted model contains scripts or powerful capabilities | Trace reachable behavior and permissions; suspicious appearance alone is not labeled a confirmed backdoor |
+| Private profile data | Server shares a profile to render one UI field | Client receives only intended public fields; private flags or unrelated profile fields remain server-side |
