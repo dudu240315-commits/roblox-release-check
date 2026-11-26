@@ -187,3 +187,13 @@ Three agents reviewed cross-server feature gaps, existing feature precision, and
 
 The package audit also found that the downloadable ZIP placed files at its root while the install instructions expect an inner skill folder. The ZIP is now rebuilt with a top-level `roblox-release-check/` directory. Its contents are checked for CRC errors and generated Python caches.
 
+## Paid random items and automated install archive
+
+Three agents reviewed monetization gaps, existing feature precision, and release usability. Added paid-random-item review guidance for direct and indirect Robux-funded currency, full outcome/odds disclosure, dynamic odds, `PolicyService` restrictions, and paid-item trading. False-positive boundaries distinguish earned-only rewards from paid random items and require tracing the actual currency source. Cross-checked against [Roblox paid random item policy](https://create.roblox.com/docs/production/monetization/paid-random-items) and [PolicyService](https://create.roblox.com/docs/reference/engine/classes/PolicyService).
+
+An independent review also corrected stored player-text guidance: filter again when retrieving persisted text for display to the intended audience; storing a filtered string at submission is not sufficient for later viewers. Added this case to verification guidance, based on [Roblox text filtering guidance](https://create.roblox.com/docs/ui/text-filtering).
+
+Added `tools/build_package.py` to create a deterministic install archive with the skill folder at the ZIP root, reject symlinks and generated Python caches, and verify contents/CRC. The local validator requires the new tool, and GitHub Actions now builds the archive and uploads it as a 14-day artifact. The workflow was checked against [GitHub's artifact documentation](https://docs.github.com/en/actions/tutorials/store-and-share-data). The archive is an Actions artifact, not a GitHub Release.
+
+Local package validation passed with 17 required files. The ZIP builder succeeded for both its default sibling output and the `dist/` path used by CI; both produced 18-file archives with a top-level `roblox-release-check/` folder and passing CRC checks. Two consecutive default builds produced byte-identical archives, confirming deterministic output. The dist test archive was removed after verification. The GitHub Actions run for these changes has not yet been checked; no Roblox Studio, live purchase, PolicyService, or text-moderation runtime test was performed.
+
