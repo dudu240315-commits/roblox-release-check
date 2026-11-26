@@ -84,6 +84,10 @@ Improved replay validation to distinguish an identical retry from an action ID r
 
 Fresh Studio Play result: 16 invalid payloads rejected, 8 identical concurrent requests produced 1 grant, 50 of 70 bounded burst requests rate-limited, cooldown recovery passed, changed-payload conflict rejected, failed-ID reuse passed, exact-balance purchase passed. Both other regression suites passed again. Play was stopped. These checks still cover isolated fixtures, not a production economy or real persistence.
 
+## Profile migration review guidance (2026-11-26)
+
+Three agent reviews identified that persistence guidance did not explicitly cover profile schema migrations. A dry-run with a backward-compatible legacy profile and a migration interrupted before persistence confirmed the revised guidance distinguishes safe repeatable conversion from data loss, and does not treat a missing schema-version field alone as a defect. This was a documentation-level evaluation only; no DataStoreService or Roblox Studio migration test was run, and the package contains no migration fixture.
+
 ## Multi-agent harness reliability review
 
 Three agents reviewed the server, test harness, and documentation independently. They confirmed a concrete harness defect: burst response inspection could fail outside protection, losing the error behind a timeout. Serial remote calls were also unbounded, and the concurrency fixture could skip cleanup on a readiness failure. No new critical server vulnerability was established; replay storage is naturally bounded to five successful purchases by this fixture's fixed balance and price.
