@@ -1,6 +1,6 @@
 # Roblox Release Check
 
-A practical AI skill for Roblox creators: find risky code before players do, including client-triggered interactions, player-written text and chat surfaces, cross-server messaging and temporary state, replicated data exposure, cross-place teleports, movement/physics paths, third-party models, HTTP/API integrations, and monetization flows such as developer products and game passes.
+A practical AI skill for Roblox creators: find risky code before players do, including client-triggered interactions, player-written text and chat surfaces, cross-server messaging and temporary state, replicated data exposure, cross-place teleports, movement/physics paths, third-party models, HTTP/API integrations, and monetization flows such as developer products, game passes, and paid random rewards.
 
 It guides an assistant through exploitable remote handlers, potential data loss, lifecycle bugs, and performance concerns, then produces prioritized findings with evidence and focused fixes. Reports follow the user's language, including Hebrew.
 
@@ -15,6 +15,10 @@ HTTP/API integration checks are guided reviews too. The reference covers secret 
 Player-written text checks are guided reviews: the skill distinguishes filtered non-chat text surfaces from conversations that must use `TextChatService`. It does not inspect live moderation outcomes.
 
 Cross-server checks cover best-effort messages and temporary MemoryStore data, including missed notifications, expiration, queue retries, and duplicate effects. These are review prompts, not a distributed-systems simulator.
+
+Paid random item checks trace Robux-funded currency, odds disclosure, and player-specific PolicyService restrictions. Random rewards that do not use Robux or Robux-purchased currency are distinguished from paid random items.
+
+Player-text review also checks saved text when it is loaded for later display: stored input must be filtered for its intended audience before it is sent to any client.
 
 This is an instruction-based skill, not a Roblox Studio plugin or a standalone scanner. It needs an AI assistant and access to your project code. Studio tools are optional; runtime tests require an appropriate Roblox environment. It does not certify an experience as secure.
 
@@ -68,6 +72,7 @@ Illustrative output, not a finding from a real project:
 - `SKILL.md`: assistant workflow and reporting rules.
 - `references/review-guide.md`: focused checks and official Roblox sources.
 - `agents/openai.yaml`: Codex display metadata and suggested prompt.
+- `tools/build_package.py`: reproducible ZIP builder with archive-content and CRC checks.
 - `VALIDATION.md`: historical test runs and limitations; read the latest section for current results.
 - `tests/studio-regression.luau`: reproducible synthetic regression checks; run on the server in an isolated Studio Play session. It intentionally reproduces defects before checking corrected behavior and does not access live data stores.
 - `tests/failure-regression.luau`: server-only NaN and lock-failure reproduction with corrected cases.
@@ -95,6 +100,10 @@ python tools/validate_package.py
 ```
 
 It checks required files, metadata, unfinished TODO placeholders, and local Markdown links. It does not run Luau or Roblox Studio tests and does not assess whether security findings are correct. See [PUBLISHING.md](PUBLISHING.md) for the release checklist, [CONTRIBUTING.md](CONTRIBUTING.md) for contribution guidance, and [SECURITY.md](SECURITY.md) for private vulnerability reporting guidance.
+
+Build the same top-level-folder ZIP locally with `python tools/build_package.py --output ../roblox-release-check.zip`. GitHub Actions also uploads this ZIP as a 14-day workflow artifact; it is not a GitHub Release asset.
+
+To download the CI artifact, open a successful workflow run and select `roblox-release-check` under Artifacts. The workflow checks the package and builds the archive; it does not run Roblox Studio or moderation/monetization flows.
 
 The skill package can be checked using Codex skill-creator's `quick_validate.py`, which is external to this repository. You need Python with PyYAML installed and a Codex installation containing that system skill. From this repository's root, the default Windows PowerShell command is:
 
