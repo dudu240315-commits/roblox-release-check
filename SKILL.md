@@ -23,6 +23,7 @@ Read [references/review-guide.md](references/review-guide.md) for the relevant c
 
 - Follow client-controlled input to authoritative rewards, purchases, damage, inventory changes, and shared state.
 - For player-written text visible to others, trace server filtering, fail-closed behavior, and server rate limits; determine whether the feature is actually chat that must use `TextChatService`.
+- For state shared across servers, trace `MessagingService` messages and `MemoryStoreService` data to consumers; check expiry, missed/repeated delivery, and duplicate effects without treating temporary state as durable.
 - Trace information that should stay private through replication and remote responses; verify what each client can read instead of treating every replicated value as sensitive.
 - When projects include Creator Store/Toolbox models or third-party packages, inspect their scripts, dynamic code loading, and granted capabilities; report a concrete reachable risk or mark an unverified source for review, not as a confirmed backdoor by itself.
 - For game passes, trace server-side ownership checks through benefit grants and later use; distinguish temporary access from permanent rewards when trials are enabled.
