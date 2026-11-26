@@ -29,6 +29,7 @@ Read [references/review-guide.md](references/review-guide.md) for the relevant c
 - Trace consequential `ProximityPrompt`, `ClickDetector`, and `DragDetector` handlers as client-triggerable entry points; use the reference guidance for their event-specific server checks.
 - For games where physics or movement changes rewards/combat/shared state, trace network ownership and `Touched` paths; account for legitimate teleports, vehicles, and latency before suggesting movement thresholds.
 - Follow player data from load through mutation to save, including failures, retries, overlapping sessions, departure, and shutdown.
+- When profile schemas change, trace legacy-data conversion, repeat/failure safety, preserved fields, and compatibility with any older servers that may still save.
 - When developer products are in scope, trace receipt callbacks through durable grants and duplicate/retry handling; read the relevant receipt guidance in the reference.
 - Inspect lifecycle and performance only where the code shows a concrete failure path or there is profiling evidence.
 
