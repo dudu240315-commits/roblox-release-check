@@ -8,7 +8,7 @@ For broad audits, it can also provide a short coverage summary showing what was 
 
 When given a Git diff or before/after versions, it can review the changed paths and relevant dependencies, separating newly introduced regressions from pre-existing risks.
 
-Cross-place teleport and data-exposure checks are guided code reviews. The included Studio fixtures do not automate those scenarios; teleport runtime checks use Studio Test/Team Test where supported and have documented limitations.
+Cross-place teleport, data-exposure, and profile-migration checks are guided code reviews. The included fixtures do not automate those scenarios; teleport runtime checks use Studio Test/Team Test where supported and have documented limitations.
 
 This is an instruction-based skill, not a Roblox Studio plugin or a standalone scanner. It needs an AI assistant and access to your project code. Studio tools are optional; runtime tests require an appropriate Roblox environment. It does not certify an experience as secure.
 
