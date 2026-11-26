@@ -36,6 +36,18 @@ When a project contains Creator Store/Toolbox models or packages, inspect the sc
 
 Sources: [Vulnerabilities from third-party assets](https://create.roblox.com/docs/scripting/security/third-party-vulnerabilities), [Toolbox](https://create.roblox.com/docs/projects/assets/toolbox), [Script Capabilities](https://create.roblox.com/docs/scripting/capabilities).
 
+## HTTP and external services
+
+When a game server calls external services with `HttpService`, trace client input through the request URL, method, headers, body, and any response that changes game state. Check whether a client can choose or influence the destination or sensitive request fields; constrain destinations to the intended service and validate inputs before sending them. Keep API keys and tokens in Roblox Secrets, retrieve them from server scripts, and restrict each secret to the specific domain it needs. Never put credentials in LocalScripts, replicated modules, client-visible values, logs, or fixtures.
+
+Treat external responses as untrusted input. Check the request result/status and validate the expected response shape, types, ranges, and authorization before using it to grant currency, items, or access. Handle transport errors and unsuccessful HTTP responses according to the feature's fallback behavior. Retries are not required for every request; where a retry is appropriate, bound attempts and delay, respect service rate limits, and make non-idempotent effects safe against duplicate processing. Avoid logging secrets or unnecessary player data.
+
+Do not report merely because HTTP is enabled, an endpoint is public, a response is not JSON, `pcall` is absent, or a request has no retry. Report a concrete exposed credential/data flow, uncontrolled destination that enables unintended requests, unvalidated response that affects important server state, or failure/retry path with a demonstrated harmful effect. If the service contract or destination is unavailable, mark the concern unassessed or uncertain rather than assuming a vulnerability.
+
+For verification, use a mock or stub service: cover a valid response, malformed response, unsuccessful status, timeout, and retry of a non-idempotent action. Confirm that invalid/failing responses do not grant benefits and retries do not duplicate them. Check that clients cannot read the secret. These checks do not require a live endpoint and do not prove the external service's behavior.
+
+Sources: [In-game HTTP requests](https://create.roblox.com/docs/cloud-services/http-service), [Secrets stores](https://create.roblox.com/docs/cloud-services/secrets), [HttpService](https://create.roblox.com/docs/reference/engine/classes/HttpService).
+
 ## Game passes
 
 Trace a pass from purchase prompt and server-side ownership lookup to the benefit grant and every later use of that benefit. Do not grant permanent value solely because a client reports purchase success; `PromptGamePassPurchaseFinished` can also report success when a free trial starts. Treat a failed ownership lookup as unknown: do not grant from it, and allow a later check to retry. If free trials are enabled, use `UserOwnsGamePassAsync` or the `Active` field for temporary access, but require `GetPassOwnershipAsync(...).Owned` before saving permanent items, currency, or unlocks. Recheck ownership when access matters instead of caching it for the full session, because trial access can end. Verify the current Creator Hub guidance before applying these APIs, as pass and trial behavior can change. This is a manual review scenario; the package does not include an automated Game Pass fixture.
@@ -108,6 +120,7 @@ If teardown callers or lifecycle wiring are outside the available code, ask a ve
 | Profile load | Storage read fails | Existing progress cannot be overwritten by fallback defaults |
 | Profile save | Older save retries after a newer save | Older state does not silently replace newer progress |
 | Profile migration | Legacy profile migrates; write fails; migration retries | Existing fields remain intact; retry is safe; unknown schema is not silently replaced by defaults |
+| HTTP integration | Mock valid/malformed response, error status, timeout, and retry | Untrusted responses do not grant benefits; retry does not duplicate a non-idempotent effect; secret stays server-only |
 | Character setup | Several respawns followed by teardown | Only the intended active handlers/tasks remain |
 
 Adapt these to the actual game. They are not proof of complete security or durability.
@@ -125,3 +138,4 @@ For a broad review, summarize coverage by area without assigning a combined scor
 | Private profile data | Server shares a profile to render one UI field | Client receives only intended public fields; private flags or unrelated profile fields remain server-side |
 | Teleport data | Source place sends currency or an access flag to the destination | Destination verifies critical state and permission server-side; plain teleport context is not accepted as authority |
 | Restricted subplace | Client attempts to join a progression-gated place without following the intended game flow | Place access settings and destination server checks match the intended design; open access is not flagged when intentional |
+
