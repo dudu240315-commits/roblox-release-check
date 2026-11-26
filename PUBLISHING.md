@@ -11,7 +11,7 @@ Repository: [github.com/dudu240315-commits/roblox-release-check](https://github.
 ## Remaining maintainer decisions
 
 1. **Choose a license.** No license is included because reuse permissions are your choice. Add the complete license text in a root `LICENSE` file and update the reminder in README. Without a license, GitHub users may view and fork the public repository under GitHub's platform terms, but you have not granted general permission to reuse, modify, or distribute the work.
-2. Confirm the `Validate package` workflow passes on GitHub. It validates packaging only; it does not run Roblox Studio fixtures.
+2. The initial published package passed the [`Validate package` workflow](https://github.com/dudu240315-commits/roblox-release-check/actions/runs/45880011745). Confirm the workflow passes again after future changes. CI validates packaging only; it does not run Roblox Studio fixtures.
 3. Add a release tag only after deciding the license and checking the published files.
 
 ## What CI covers
