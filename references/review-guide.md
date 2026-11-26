@@ -42,6 +42,14 @@ Trace a pass from purchase prompt and server-side ownership lookup to the benefi
 
 Sources: [Passes](https://create.roblox.com/docs/production/monetization/passes), [MarketplaceService](https://create.roblox.com/docs/reference/engine/classes/MarketplaceService).
 
+## Teleports between places and servers
+
+When an experience moves players between places or servers, trace the source `TeleportAsync` call through destination-side `Player:GetJoinData()` and any client use of `GetLocalPlayerTeleportData()` or `TeleportService` settings. `GetJoinData()` can provide server-verified `SourcePlaceId`/`SourceGameId` for allowlist checks, but an approved source proves only where the data came from, not that every field is valid or that a reward is deserved. `TeleportData` is visible to the client and may still be abused. Use it only for non-sensitive context such as a map choice or display preference. Do not use it alone to grant currency, inventory, paid benefits, or elevated access; confirm critical state through a server-owned data source and validate the player's eligibility in the destination. Review the experience's Access Control for Places setting when some subplaces are progression-gated or private; do not insist on a restrictive setting if open access is intentional. Protect reserved-server access material, validate destination IDs against the experience's intended places, and handle teleport failures without duplicating grants or leaving the player in an inconsistent state. If code or place mappings for either side are missing, report the cross-place flow as not fully assessed rather than assuming the payload is trusted.
+
+For runtime verification, the current `TeleportAsync()` flow can be tested in Studio Test and Team Test without publishing. These modes do not support deprecated teleport methods; they also differ from production for `PrivateServerId`/`JobId`, and VIP teleports fail in testing. Keep those limitations in mind when interpreting results, and check the current Creator Hub guide before choosing a test mode.
+
+Sources: [Teleport between places](https://create.roblox.com/docs/projects/teleport), [TeleportService](https://create.roblox.com/docs/reference/engine/classes/TeleportService), [Player:GetJoinData](https://create.roblox.com/docs/reference/engine/classes/Player#GetJoinData).
+
 Check the contract for reusing an action ID with a different payload: reject the conflict or return the original outcome consistently, rather than execute a different action under the same identity. Test that rejected requests do not consume IDs unless the protocol intentionally specifies that behavior. Include exact-balance purchases and legitimate purchases with distinct IDs as positive controls.
 
 Trace yields and asynchronous helper calls between validation and mutation. Determine whether overlapping requests can both pass a balance, ownership, or availability check before either commits. Recommend serialization or revalidation only when this interleaving is reachable; do not assume every handler overlaps at every statement.
@@ -102,7 +110,9 @@ For a broad review, summarize coverage by area without assigning a combined scor
 | Developer product | Same `PurchaseId` is delivered twice or callback transform is retried | Benefit is recorded once; transform has no repeated external side effect |
 | Developer product | Profile write fails, player is absent, then processing retries | Receipt remains unacknowledged until grant is safely recorded |
 | Receipt routing | Filtered `BindReceiptHandler` and fallback `ProcessReceipt` coexist | Each product reaches its intended handler; no unhandled product or duplicate grant |
-| Game pass | Client reports purchase success, or ownership lookup fails | The server does not grant from the client signal alone; failed lookup remains unknown and does not create permanent value |
+| Game pass | Client reports purchase success, but server ownership lookup returns false or errors | No permanent grant from the client signal; false means not confirmed, error remains unknown and can be retried |
 | Game pass trial | A trial provides access while the game also grants saved currency, items, or unlocks | Use `Active` for temporary access and `Owned` for permanent saved benefits; a trial alone must not create a permanent grant |
 | Third-party model | Inserted model contains scripts or powerful capabilities | Trace reachable behavior and permissions; suspicious appearance alone is not labeled a confirmed backdoor |
 | Private profile data | Server shares a profile to render one UI field | Client receives only intended public fields; private flags or unrelated profile fields remain server-side |
+| Teleport data | Source place sends currency or an access flag to the destination | Destination verifies critical state and permission server-side; plain teleport context is not accepted as authority |
+| Restricted subplace | Client attempts to join a progression-gated place without following the intended game flow | Place access settings and destination server checks match the intended design; open access is not flagged when intentional |
