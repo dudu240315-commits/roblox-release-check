@@ -22,6 +22,7 @@ For a review request, report findings without changing the project. For an expli
 Read [references/review-guide.md](references/review-guide.md) for the relevant checks and official sources. Prioritize reachable bugs over style preferences:
 
 - Follow client-controlled input to authoritative rewards, purchases, damage, inventory changes, and shared state.
+- For player-written text visible to others, trace server filtering, fail-closed behavior, and server rate limits; determine whether the feature is actually chat that must use `TextChatService`.
 - Trace information that should stay private through replication and remote responses; verify what each client can read instead of treating every replicated value as sensitive.
 - When projects include Creator Store/Toolbox models or third-party packages, inspect their scripts, dynamic code loading, and granted capabilities; report a concrete reachable risk or mark an unverified source for review, not as a confirmed backdoor by itself.
 - For game passes, trace server-side ownership checks through benefit grants and later use; distinguish temporary access from permanent rewards when trials are enabled.
@@ -30,7 +31,7 @@ Read [references/review-guide.md](references/review-guide.md) for the relevant c
 - For games where physics or movement changes rewards/combat/shared state, trace network ownership and `Touched` paths; account for legitimate teleports, vehicles, and latency before suggesting movement thresholds.
 - Follow player data from load through mutation to save, including failures, retries, overlapping sessions, departure, and shutdown.
 - When profile schemas change, trace legacy-data conversion, repeat/failure safety, preserved fields, and compatibility with any older servers that may still save.
-- When developer products are in scope, trace receipt callbacks through durable grants and duplicate/retry handling; read the relevant receipt guidance in the reference.
+- When developer products are in scope, trace receipt callbacks through durable grants and duplicate handling; use the reference for actual retry triggers instead of assuming a timed retry.
 - When `HttpService` or an external API affects gameplay, trace credentials, client-controlled request fields, response validation, failure handling, and duplicate side effects; do not treat HTTP use alone as a finding.
 - Inspect lifecycle and performance only where the code shows a concrete failure path or there is profiling evidence.
 
