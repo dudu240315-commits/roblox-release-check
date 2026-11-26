@@ -20,7 +20,7 @@ jobs:
       - name: Build install archive
         run: python tools/build_package.py --output dist/roblox-release-check.zip
       - name: Upload install archive
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: roblox-release-check
           path: dist/roblox-release-check.zip
