@@ -166,3 +166,10 @@ Three agents reviewed security scope, receipt mock semantics, and package consis
 Added a movement/physics review path for network-owned assemblies and consequential `Touched` events, with guidance to account for game mechanics and latency before proposing thresholds. README now accurately describes which test runners print a report. These documentation/mock changes were structurally validated; no Studio place was connected, so the modified receipt fixture has not been run in Studio this turn.
 
 Added `tests/receipt-regression.luau`, an in-memory model for duplicate and reordered receipts, absent players, unknown products, failed writes, successful retry, and repeated transform invocation. It uses mock result strings, does not call MarketplaceService or DataStoreService, and cannot prove cross-server guarantees. Runtime execution was not performed in this pass because the only connected Studio session was the existing cloud experience in Play mode; the receipt fixture was not run against it. Structural package validation passed instead.
+
+## HTTP integration review guidance
+
+Three independent agents reviewed the feature gap and false-positive boundaries. They found no existing focused guidance for `HttpService` or external service calls. Added a manual review path for secret storage, client-controlled request fields, response validation before important state changes, error handling, and safe bounded retries where needed. Added mock-only verification cases and explicit guards against flagging HTTP use, public endpoints, missing `pcall`, or absent retries by themselves. Checked the guidance against current Roblox Creator Hub documentation for [in-game HTTP requests](https://create.roblox.com/docs/cloud-services/http-service), [Secrets stores](https://create.roblox.com/docs/cloud-services/secrets), and [HttpService](https://create.roblox.com/docs/reference/engine/classes/HttpService).
+
+This is a documentation-level improvement. No live endpoint was called and no Roblox Studio HTTP runtime test was run; package validation checks structure and local links, not the accuracy of the review itself.
+
