@@ -7,6 +7,7 @@ Repository: [github.com/dudu240315-commits/roblox-release-check](https://github.
 - Skill instructions, Codex metadata, creator-facing README, and official Roblox references.
 - Studio-only regression fixtures with documented limits.
 - `CONTRIBUTING.md`, `SECURITY.md`, and a GitHub Actions packaging check.
+- A reproducible ZIP builder and a 14-day downloadable artifact from each Actions run.
 
 ## Remaining maintainer decisions
 
@@ -16,6 +17,7 @@ Repository: [github.com/dudu240315-commits/roblox-release-check](https://github.
 
 ## What CI covers
 
-The workflow checks required files, skill metadata, unresolved TODO placeholders, and local Markdown links using Python's standard library. Luau fixtures require Roblox Studio and remain manual. Passing CI validates packaging consistency only; it does not verify runtime behavior or certify the AI skill's security findings.
+The workflow checks required files, skill metadata, unresolved TODO placeholders, and local Markdown links, then builds and validates the install ZIP using Python's standard library. The ZIP is uploaded as a 14-day workflow artifact, not a GitHub Release asset. Luau fixtures require Roblox Studio and remain manual. Passing CI validates packaging consistency only; it does not verify runtime behavior or certify the AI skill's security findings.
 
 Optional for a small first release: Code of Conduct, issue forms, badges, and a changelog. Add them when you have a contributor community or a release cadence.
+
